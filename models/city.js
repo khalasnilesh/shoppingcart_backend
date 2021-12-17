@@ -6,3 +6,5 @@ class City {
         this.country_id = country_id;
     }
 }
+
+module.exports = City;

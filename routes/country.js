@@ -1,7 +1,9 @@
 const express = require('express');
-const contryController = require("../controllers/country");
+const countryController = require("../controllers/country");
 const router = express.Router();
 
-router.get('/country', contryController.country);
+router.get('/country', countryController.country);
+router.get('/state/:id', countryController.state);
+router.get('/city/:id', countryController.city);
 
 module.exports = router;

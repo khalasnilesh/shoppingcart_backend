@@ -5,3 +5,5 @@ class State {
         this.country_id = country_id;
     }
 }
+
+module.exports = State;
