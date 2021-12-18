@@ -13,4 +13,21 @@ exports.register = async (req,res,next) =>{
     }
 }
 
+exports.login = async(req,res,next)=>{
+    try{
+        const email = req.body.email;
+        const password = req.body.password;
+        const user = await firestore.collection('users').doc(email,password);
+        const data = await user.get();
+        if(data.empty){
+            res.send({message:'no user found',status:'success'})
+        }
+        else{
+            res.send({message:'login Successfully',status:'success'});
+        }
+    }catch(error){
+        console.log(error);
+        res.send({message:'error in login',status:'fail'});
+    }
+}
 
