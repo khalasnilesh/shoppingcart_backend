@@ -58,8 +58,8 @@ exports.getstateById = async (req,res,next) =>{
 
 exports.getcityById = async (req,res,next) =>{
     try{
-        const state_id = req.params.stateId;
-        const country_id = req.params.countryId;
+        const state_id = req.query.state_id;
+        const country_id = req.query.country_id;
         console.log(country_id);
         const cityDetails = await firestore.collection('city').where('state_id','==',state_id).where('country_id','==',country_id).get();
         //const data = await state.get();
@@ -68,13 +68,13 @@ exports.getcityById = async (req,res,next) =>{
             res.status(404).send({message:"No city found"});
         }else{
             cityDetails.forEach(doc =>{
-                const state = new City(
+                const city = new City(
                     doc.id,
                     doc.data().name,
                     doc.data().state_id,
                     doc.data().country_id
                 );
-                cityArray.push(state);
+                cityArray.push(city);
             });
             console.log(cityArray);
             res.send({message:'cities fetch Successfully',status:'success',data:cityArray});

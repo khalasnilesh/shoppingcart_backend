@@ -4,6 +4,6 @@ const router = express.Router();
 
 router.get('/country', countryController.country);
 router.get('/state/:countryId', countryController.getstateById);
-router.get('/city/state/:stateId/country/:countryId', countryController.getcityById);
+router.get('/city', countryController.getcityById);
 
 module.exports = router;
