@@ -78,6 +78,7 @@ exports.getAllUsers = async(req,res,next)=>{
                     doc.data().email,
                     doc.data().password,
                     doc.data().phone,
+                    doc.data().role_id,
                     doc.data().city_id,
                     doc.data().state_id,
                     doc.data().country_id
