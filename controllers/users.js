@@ -17,13 +17,28 @@ exports.login = async(req,res,next)=>{
     try{
         const email = req.body.email;
         const password = req.body.password;
-        const user = await firestore.collection('users').doc(email,password);
-        const data = await user.get();
-        if(data.empty){
+        const user = await firestore.collection('users').where('email','=',email).where('password','=',password).get();
+        console.log(user);
+        const usersArray = [];
+        if(user.empty){
             res.send({message:'no user found',status:'success'})
         }
         else{
-            res.send({message:'login Successfully',status:'success'});
+            user.forEach(doc =>{
+                const user = new User(
+                    doc.id,
+                    doc.data().name,
+                    doc.data().email,
+                    doc.data().password,
+                    doc.data().phone,
+                    doc.data().role_id,
+                    doc.data().city_id,
+                    doc.data().state_id,
+                    doc.data().country_id
+                );
+                usersArray.push(user);
+            });
+            res.send({message:'login Successfully',status:'success', data : usersArray});
         }
     }catch(error){
         console.log(error);
