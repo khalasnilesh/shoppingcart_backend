@@ -27,32 +27,25 @@ exports.country = async (req,res,next) =>{
     }
 }
 
-exports.state = async (req,res,next) =>{
+exports.getstateById = async (req,res,next) =>{
     try{
-        const country_id = req.query.country_id;
-        const state = await firestore.collection('states').where('country_id','=',country_id).get();
+        const country_id = req.params.countryId;
+        console.log(country_id);
+        const stateDetails = await firestore.collection('states').where('country_id','=',country_id).get();
+        console.log(stateDetails)
         //const data = await state.get();
         const stateArray = [];
-        if(state.empty){
+        if(stateDetails.empty){
             res.status(404).send({message:"No country found"});
         }else{
-            // data.forEach(doc =>{
-            //     const state = new State(
-            //         doc.id,
-            //         doc.data().name,
-            //         doc.data().country_id
-            //     );
-            //     stateArray.push(state);
-            // });
-            console.log(state);
-            for(i = 0; i< state.length ; i++){
+            stateDetails.forEach(doc =>{
                 const state = new State(
-                            i.id,
-                            i.data().name,
-                            i.data().country_id
-                        );
-                        stateArray.push(state);
-            }
+                    doc.id,
+                    doc.data().name,
+                    doc.data().country_id
+                );
+                stateArray.push(state);
+            });
             console.log(stateArray);
             res.send({message:'state fetch Successfully',status:'success',data:stateArray});
         }
@@ -60,23 +53,36 @@ exports.state = async (req,res,next) =>{
         console.log(error);
         res.send({message:'error',status:'fail',message:error});
     }
+
 }
 
-exports.city = async (req,res,next) =>{
+exports.getcityById = async (req,res,next) =>{
     try{
-        const country_id = req.query.country_id;
-        const state_id = req.query.state_id;
-        const state = await firestore.collection('city').doc();
-        const data = await state.get();
-        if(data.empty){
+        const state_id = req.params.stateId;
+        const country_id = req.params.countryId;
+        console.log(country_id);
+        const cityDetails = await firestore.collection('city').where('state_id','==',state_id).where('country_id','==',country_id).get();
+        //const data = await state.get();
+        const cityArray = [];
+        if(cityDetails.empty){
             res.status(404).send({message:"No city found"});
         }else{
-            console.log(data.data());
-            res.send({message:'city fetch Successfully',status:'success', data:(data.data())});
+            cityDetails.forEach(doc =>{
+                const state = new City(
+                    doc.id,
+                    doc.data().name,
+                    doc.data().state_id,
+                    doc.data().country_id
+                );
+                cityArray.push(state);
+            });
+            console.log(cityArray);
+            res.send({message:'cities fetch Successfully',status:'success',data:cityArray});
         }
     }catch(error){
         console.log(error);
         res.send({message:'error',status:'fail',message:error});
     }
+
 }
 

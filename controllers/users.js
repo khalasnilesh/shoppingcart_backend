@@ -33,10 +33,18 @@ exports.login = async(req,res,next)=>{
 
 exports.forgotpassword = async(req,res,next)=>{
     try{
+        const id = req.params.id;
         const email = req.query.email;
         const Password = req.body.password;
-        const user = await firestore.collection('users').doc(email);
-        await user.update({ 'password' : Password});
+        const userDetails = await firestore.collection('users').where('email','=',email).get()
+        .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                console.log(doc.id, " => ", doc.data());
+                doc.ref.update({password: Password})
+            });
+       })
+        // console.log(userDetails);
+        // await userDetails.update({ 'password' : Password});
             res.send({message:'password updated successfully',status :'success'})
     }catch(error){
         console.log(error);

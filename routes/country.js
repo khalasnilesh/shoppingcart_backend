@@ -3,7 +3,7 @@ const countryController = require("../controllers/country");
 const router = express.Router();
 
 router.get('/country', countryController.country);
-router.get('/state', countryController.state);
-router.get('/city', countryController.city);
+router.get('/state/:countryId', countryController.getstateById);
+router.get('/city/state/:stateId/country/:countryId', countryController.getcityById);
 
 module.exports = router;
