@@ -31,3 +31,15 @@ exports.login = async(req,res,next)=>{
     }
 }
 
+exports.forgotpassword = async(req,res,next)=>{
+    try{
+        const email = req.query.email;
+        const Password = req.body.password;
+        const user = await firestore.collection('users').doc(email);
+        await user.update({ 'password' : Password});
+            res.send({message:'password updated successfully',status :'success'})
+    }catch(error){
+        console.log(error);
+        res.send({message:'error in updating passowrd',status:'fail'});
+    }
+}
