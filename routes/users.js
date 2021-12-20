@@ -13,6 +13,6 @@ router.post('/login', userController.login);
 router.put('/forgotpassword', userController.forgotpassword);
 router.put('/updateprofile/:Id', userController.updateuser);
 router.delete('/delete/:Id', userController.deleteUser);
-router.get('/user/logout',userController.userLogout);
+router.get('/api/logout/',userController.userLogout);
 
 module.exports = router;
