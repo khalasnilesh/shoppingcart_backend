@@ -23,11 +23,11 @@ module.exports = {
     host : HOST,
     url : HOST_URL,
     firebaseConfig : {
-        apiKey: "AIzaSyCnFkP2MXZBgciGQEUMuFGtqyhYtdtfg88",
-        authDomain: "shoppingcart-c5585.firebaseapp.com",
-        projectId: "shoppingcart-c5585",
-        storageBucket: "shoppingcart-c5585.appspot.com",
-        messagingSenderId: "819161390042",
-        appId: "1:819161390042:web:864a4225d70cfe7723bee3"
+        apiKey: "AIzaSyCuDJH2YOUc_QaFEpiyzQkMv1qO-yampdg",
+        authDomain: "shoppingcart-8c23f.firebaseapp.com",
+        projectId: "shoppingcart-8c23f",
+        storageBucket: "shoppingcart-8c23f.appspot.com",
+        messagingSenderId: "162461639042",
+        appId: "1:162461639042:web:ba1130e5dc8578921bef9b"
     }
 }
