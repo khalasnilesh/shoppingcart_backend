@@ -33,7 +33,7 @@ exports.addRole = async(req,res,next)=>{
         res.send({message:'Role Add Successfully',status:'success',data:role});
     } catch (error) {
         console.log(error);
-        res.send({message:'error in register',status:'fail'});
+        res.send({message:'error in inserting role',status:'fail'});
     }
 }
 
@@ -47,7 +47,7 @@ exports.updateRole = async(req,res,next)=>{
     }
     catch(error){
         console.log(error);
-        res.send({message:'error in updating passowrd',status:'fail'});
+        res.send({message:'error in updating category',status:'fail'});
     }
 }
 

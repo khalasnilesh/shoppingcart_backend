@@ -7,6 +7,7 @@ const app = express();
 const userRoutes = require('./routes/users');
 const countryRoutes = require('./routes/country');
 const roleRoutes = require('./routes/roles');
+const categoryRoutes = require('./routes/category');
 const session = require('express-session');
 
 app.use(express.json());
@@ -24,6 +25,7 @@ app.use(session({
 app.use('/users' , userRoutes);
 app.use('/api', countryRoutes);
 app.use('/role' , roleRoutes);
+app.use('/category',categoryRoutes);
 
 app.get('/', (req,res) => res.send('hello this is node js project'));
 
