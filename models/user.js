@@ -10,3 +10,5 @@ class User {
         this.country_id = country_id;
     }
 }
+
+module.exports = User;
