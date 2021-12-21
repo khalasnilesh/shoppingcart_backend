@@ -10,9 +10,10 @@ router.get('/:Id',userController.getUserByID);
 router.post('/register', userController.register);
 router.post('/adduser', userController.addUser);
 router.post('/login', userController.login);
-router.put('/forgotpassword', userController.forgotpassword);
+//router.get('/forgotpassword', userController.forgotpassword);
 router.put('/updateprofile/:Id', userController.updateuser);
 router.delete('/delete/:Id', userController.deleteUser);
 router.get('/api/logout/',userController.userLogout);
+router.get('/api/forgotpassword',userController.finalForgotPassword);
 
 module.exports = router;

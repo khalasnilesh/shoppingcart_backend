@@ -1,6 +1,7 @@
 const firebase = require('../db');
 const User = require('../models/user');
 const firestore = firebase.firestore();
+const nodemailer = require('nodemailer');
 
 exports.register = async (req,res,next) =>{
     try {
@@ -46,24 +47,97 @@ exports.login = async(req,res,next)=>{
     }
 }
 
-exports.forgotpassword = async(req,res,next)=>{
-    try{
-        const id = req.params.id;
+
+// exports.forgotpassword = async(req,res,next)=>{
+//     try{
+//         const id = req.params.id;
+//         const email = req.query.email;
+//        // const Password = req.body.password;
+//        async function main() {
+//         // Generate test SMTP service account from ethereal.email
+//         // Only needed if you don't have a real mail account for testing
+//         let testAccount = await nodemailer.createTestAccount();
+      
+//         // create reusable transporter object using the default SMTP transport
+//         let transporter = nodemailer.createTransport({
+//           host: "smtp.gmail.com",
+//           port: 587,
+//           secure: false, // true for 465, false for other ports
+//           auth: {
+//             user: "gargipatel612@gmail.com", // generated ethereal user
+//             pass: "gargi@612" // generated ethereal password
+//           }
+//         });
+      
+//         // send mail with defined transport object
+//         let info = await transporter.sendMail({
+//           from: '"gargi patel"', // sender address
+//           to: "shreyapatel6121997@gmail.com", // list of receivers
+//           subject: "about details", // Subject line
+//           html: "name: "+to1, "Contact: ":+contact,"course: ":+course 
+          
+//           // html body
+//         });
+      
+//         console.log("Message sent: %s", info.messageId);
+//         // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      
+//         // Preview only available when sending through an Ethereal account
+//         console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+//         // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+//       }
+       
+//         res.send({message:'mail send successfully',status :'success'})
+//     }catch(error){
+//         console.log(error);
+//         res.send({message:'error in updating password',status:'fail'});
+//     }
+// }
+
+exports.finalForgotPassword = function(req,res,next){
+    try {
         const email = req.query.email;
-        const Password = req.body.password;
-        const userDetails = await firestore.collection('users').where('email','=',email).get()
-        .then(function(querySnapshot) {
-            querySnapshot.forEach(function(doc) {
-                console.log(doc.id, " => ", doc.data());
-                doc.ref.update({password: Password})
+        console.log(email);
+        firestore.collection('users').where('email','=',email).get();
+        async function main() {
+            // Generate test SMTP service account from ethereal.email
+            // Only needed if you don't have a real mail account for testing
+            let testAccount = await nodemailer.createTestAccount();
+          
+            // create reusable transporter object using the default SMTP transport
+            let transporter = nodemailer.createTransport({
+              host: "smtp.gmail.com",
+              port: 587,
+              secure: false, // true for 465, false for other ports
+              auth: {
+                user: "29shreya11@gmail.com", // generated ethereal user
+                pass: "fgjycagzmbwrzlim", // generated ethereal password
+              },
             });
-       })
-        // console.log(userDetails);
-        // await userDetails.update({ 'password' : Password});
-            res.send({message:'password updated successfully',status :'success'})
-    }catch(error){
+          
+            // send mail with defined transport object
+            let info = await transporter.sendMail({
+              from: 'shreya shah', // sender address
+              to: email, // list of receivers
+              subject: "forgot password", // Subject line
+              text: "url for forgot password", // plain text body
+              html: "http://localhost:4200/reset-password", // html body
+            });
+          
+            console.log("Message sent: %s", info.messageId);
+            // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+          
+            // Preview only available when sending through an Ethereal account
+            console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+            // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+          }
+          
+          main().catch(console.error);
+          res.send({message:'mail sent',status:'success'});  
+    
+    } catch (error) {
         console.log(error);
-        res.send({message:'error in updating password',status:'fail'});
+        res.send({message:'error in sending mail',status:'fail'});
     }
 }
 
