@@ -63,6 +63,7 @@ exports.getRoleById = async(req,res,next)=>{
         }
     } catch (error) {
         console.log(error);
+        res.send({message:"error in role fetch", status: 'fail'});
     }
 }
 
@@ -73,5 +74,6 @@ exports.deleteRoleById = async(req,res,next)=>{
         res.send({message:'role deleted Successfully',status:'success'});
     } catch (error) {
         console.log(error);
+        res.send({message:"error in role deleting", status: 'fail'});
     }
 }
