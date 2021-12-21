@@ -24,7 +24,7 @@ exports.getAllProduct = async(req,res,next)=>{
                 );
                 productArray.push(product);
             });
-            res.send({message:'roles fetch Successfully',status:'success',data: productArray});
+            res.send({message:'products fetch Successfully',status:'success',data: productArray});
         }
     } catch (error) {
         console.log(error);
@@ -118,7 +118,7 @@ exports.getProductShowOn = async(req,res,next)=>{
                 );
                 productArray.push(product);
             });
-            res.send({message:'roles fetch Successfully',status:'success',data: productArray});
+            res.send({message:'product fetch Successfully',status:'success',data: productArray});
         }
     } catch (error) {
         console.log(error);
