@@ -33,7 +33,6 @@ exports.login = async(req,res,next)=>{
                     doc.id,
                     doc.data().name,
                     doc.data().email,
-                    doc.data().password,
                     doc.data().phone,
                     doc.data().role_id,
                     doc.data().city_id,
@@ -168,7 +167,6 @@ exports.getAllUsers = async(req,res,next)=>{
                     doc.id,
                     doc.data().name,
                     doc.data().email,
-                    doc.data().password,
                     doc.data().phone,
                     doc.data().role_id,
                     doc.data().city_id,
@@ -207,8 +205,19 @@ exports.getUserByID = async(req,res,next)=>{
         const usersArray = [];
         if(data.empty){
             res.status(404).send({message:"No user found"});
-        }else{           
-            res.send({message:'user fetch Successfully',status:'success',data: data.data()});
+        }else{         
+            const userDetail = {
+                id : data.id,
+                name : data.data().name,
+                email : data.data().email,
+                phone : data.data().phone,
+                role_id : data.data().role_id,
+                city_id : data.data().city_id,
+                state_id : data.data().state_id,
+                country_id : data.data().country_id
+
+            }
+            res.send({message:'user fetch Successfully',status:'success',data: userDetail});
         }
     } catch (error) {
         console.log(error);
