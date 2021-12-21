@@ -21,7 +21,7 @@ exports.login = async(req,res,next)=>{
         console.log(user);
         const usersArray = [];
         if(user.empty){
-            res.send({message:'no user found',status:'success'})
+            res.send({message:'no user found',status:'fail'});
         }
         else{
             user.forEach(doc =>{
@@ -38,7 +38,7 @@ exports.login = async(req,res,next)=>{
                 );
                 usersArray.push(user);
             });
-            res.send({message:'login Successfully',status:'success', data : usersArray});
+            res.send({message:'login Successfully',status:'success', data : usersArray[0]});
         }
     }catch(error){
         console.log(error);
