@@ -193,7 +193,7 @@ exports.updateuser = async(req,res,next) =>{
     }
     catch(error){
         console.log(error);
-        res.send({message:'error in updating passowrd',status:'fail'});
+        res.send({message:'error in updating user',status:'fail'});
     }
 }
 
@@ -221,6 +221,7 @@ exports.getUserByID = async(req,res,next)=>{
         }
     } catch (error) {
         console.log(error);
+        res.send({message:'error in getting user',status:'fail'});
     }
 }
 
@@ -231,6 +232,7 @@ exports.deleteUser = async(req,res,next)=>{
         res.send({message:'user deleted Successfully',status:'success'});
     } catch (error) {
         console.log(error);
+        res.send({message:'error in deleting user',status:'fail'});
     }
 }
 
@@ -242,14 +244,24 @@ exports.userLogout = async(req,res,next)=>{
         })
     } catch (error) {
         console.log(error);
+        res.send({message:'error in logout',status:'fail'});
     }
 }
 
 exports.resetPassword = async(req,res,next)=>{
     try {
-        const email = req.params.email;
-        firestore.collection('users').where('email','=',email).get();
+        const email = req.query.email;
+        const Password = req.body.password;
+        firestore.collection('users').where('email','=',email).get()
+        .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                console.log(doc.id, " => ", doc.data());
+                doc.ref.update({password: Password})
+            });
+       })
+            res.send({message:"Password reset successfully! ",status:'success'})
     } catch (error) {
         console.log(error);
+        res.send({message:'error in updating passowrd',status:'fail'});
     }
 }
