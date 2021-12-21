@@ -2,6 +2,7 @@ const firebase = require('../db');
 const User = require('../models/user');
 const firestore = firebase.firestore();
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 
 exports.register = async (req,res,next) =>{
     try {
@@ -25,6 +26,8 @@ exports.login = async(req,res,next)=>{
             res.send({message:'no user found',status:'fail'});
         }
         else{
+            var token = jwt.sign({email,password},'secret');
+            user['token'] = token;
             user.forEach(doc =>{
                 const user = new User(
                     doc.id,
@@ -39,7 +42,7 @@ exports.login = async(req,res,next)=>{
                 );
                 usersArray.push(user);
             });
-            res.send({message:'login Successfully',status:'success', data : usersArray[0]});
+            res.send({message:'login Successfully',status:'success', data : usersArray[0] , token : token});
         }
     }catch(error){
         console.log(error);
@@ -121,7 +124,7 @@ exports.finalForgotPassword = function(req,res,next){
               to: email, // list of receivers
               subject: "forgot password", // Subject line
               text: "url for forgot password", // plain text body
-              html: "http://localhost:4200/reset-password", // html body
+              html: "<p>Hello</p></br> Here is your link to rest password <br/>http://localhost:4200/reset-password <br/> Thanks And Regards, <br/> Shopping Cart team", // html body
             });
           
             console.log("Message sent: %s", info.messageId);
@@ -228,6 +231,15 @@ exports.userLogout = async(req,res,next)=>{
         req.session.destroy(function (err) {
             res.send({message:"Successfully Logout! ",status:'success'})
         })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.resetPassword = async(req,res,next)=>{
+    try {
+        const email = req.params.email;
+        firestore.collection('users').where('email','=',email).get();
     } catch (error) {
         console.log(error);
     }

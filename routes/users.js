@@ -15,5 +15,6 @@ router.put('/updateprofile/:Id', userController.updateuser);
 router.delete('/delete/:Id', userController.deleteUser);
 router.get('/api/logout/',userController.userLogout);
 router.get('/api/forgotpassword',userController.finalForgotPassword);
+router.post('/resetpassword', userController.resetPassword);
 
 module.exports = router;
