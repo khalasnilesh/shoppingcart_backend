@@ -29,7 +29,7 @@ exports.addCategory = async(req,res,next)=>{
     try {
         const data = req.body;
         const category = await firestore.collection('category').doc().set(data);
-        res.send({message:'Role Add Successfully',status:'success'});
+        res.send({message:'Category Add Successfully',status:'success'});
     } catch (error) {
         console.log(error);
         res.send({message:'error in inserting category',status:'fail'});
