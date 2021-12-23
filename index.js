@@ -11,9 +11,11 @@ const categoryRoutes = require('./routes/category');
 const productRoutes = require('./routes/product');
 const session = require('express-session');
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(cors());
-app.use(express.static('uploads'));
+app.use(express.static('src/uploads'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
     name : 'codeil',
@@ -30,7 +32,19 @@ app.use('/role' , roleRoutes);
 app.use('/category',categoryRoutes);
 app.use('/product', productRoutes);
 
-app.get('/', (req,res) => res.send('hello this is node js project'));
+app.get('/', function(req, res) {
+  res.render('../views/home');
+});
+
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
 
 app.listen(config.port, () => console.log("App is listening on ",+ config.port));
 
