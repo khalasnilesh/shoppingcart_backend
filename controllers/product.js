@@ -34,7 +34,7 @@ exports.getAllProduct = async(req,res,next)=>{
 
 exports.addNewProduct = async(req,res,next)=>{
     try {
-        console.log(req.file);
+        console.log(req.file.path);
         const name = req.body.name;
         const price = req.body.price;
         const description = req.body.description;
