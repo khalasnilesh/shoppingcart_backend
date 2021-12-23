@@ -45,7 +45,7 @@ exports.addNewProduct = async(req,res,next)=>{
         res.send({message:'Product Add Successfully',status:'success',data:product});
     } catch (error) {
         console.log(error);
-        res.send({message:'error in inserting product',status:'fail'});
+        res.send({message:'error in inserting product',status:'fail',data : error});
     }
 }
 
