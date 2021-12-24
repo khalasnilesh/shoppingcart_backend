@@ -7,5 +7,8 @@ router.use(bodyParser.json());
 
 router.get('/', discoutController.getAllDiscount);
 router.post('/add_discount', discoutController.addDiscount);
+router.get('/:Id', discoutController.getDiscountById);
+router.put('/update_discount/:Id', discoutController.updateDiscount);
+router.delete('/delete_discount/:Id', discoutController.deleteDiscount);
 
 module.exports = router;

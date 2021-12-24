@@ -58,7 +58,7 @@ exports.updateDiscount = async(req,res,next)=>{
     try{
         const id = req.params.Id;
         const promo = req.body.promo;
-        const disc_perc = req.body.disc_percentage;
+        const disc_perc = req.body.disc_perc;
         const product_id = req.body.product_id;
         const discount = await firestore.collection('discount').doc(id);
         await discount.update({'promo' : promo , 'disc_perc' : disc_perc , 'product_id' : product_id});
