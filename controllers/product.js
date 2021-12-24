@@ -54,7 +54,6 @@ exports.addNewProduct = async(req,res,next)=>{
         const show_on = req.body.show_on;
         const result = await uploadFile(image);
         console.log(result);
-        
         const product = await firestore.collection('product').doc().set({'name':name , 'price' : price , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': show_on});
         res.send({message:'Product Add Successfully',status:'success',data:product});
     } catch (error) {
@@ -66,17 +65,17 @@ exports.addNewProduct = async(req,res,next)=>{
 exports.updateProduct = async(req,res,next)=>{
     try {
         const id = req.params.Id;
-        console.log(req.file);
-        const data = {
-            name : req.body.name,
-            price : req.body.price,
-            description : req.body.description,
-            category_id : req.body.category_id,
-            image : req.file.path,
-            show_on : req.body.show_on,
-        }        
+        console.log(req.file);        
+            const name = req.body.name;
+            const price = req.body.price;
+            const description = req.body.description;
+            const category_id = req.body.category_id;
+            const image = req.file;
+            const show_on = req.body.show_on;
+            const result = await uploadFile(image);
+            console.log(result);
         const product = await firestore.collection('product').doc(id)
-        await product.update(data);
+        await product.update({'name': name, 'price' : price , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': show_on});
         res.send({message:'Product updated Successfully',status:'success'});
     } catch (error) {
         console.log(error);

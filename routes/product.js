@@ -34,7 +34,7 @@ const upload = multer({
 });
 
 router.get('/', productController.getAllProduct);
-router.post('/addproduct', productController.addNewProduct);
+router.post('/addproduct',upload.single('image'), productController.addNewProduct);
 router.put('/updateproduct/:Id',upload.single('image'), productController.updateProduct);
 router.get('/:Id', productController.getProductById);
 router.delete('/deleteproduct/:Id', productController.deleteProductById);
