@@ -1,8 +1,12 @@
+const { file } = require('googleapis/build/src/apis/file');
 const firebase = require('../db');
 const Product = require('../models/product');
 const firestore = firebase.firestore();
-firestore.settings({ignoreUndefinedProperties : true})
-
+firestore.settings({ignoreUndefinedProperties : true});
+const {uploadFile, getFileStream} = require('../s3');
+const fs = require('fs');
+const util = require('util');
+const unlinkFile = util.promisify(fs.unlink);
 
 exports.getAllProduct = async(req,res,next)=>{
     try {
@@ -32,16 +36,26 @@ exports.getAllProduct = async(req,res,next)=>{
     }
 }
 
+exports.getProductKey = function(req,res,next) {
+    const key = req.params.key;
+    const readStream = getFileStream(key)
+
+    readStream.pipe(res);
+}
+
 exports.addNewProduct = async(req,res,next)=>{
     try {
-        console.log(req.file.path);
+        console.log(req.file);
         const name = req.body.name;
         const price = req.body.price;
         const description = req.body.description;
         const category_id = req.body.category_id;
-        const image = req.file.path;
+        const image = req.file;
         const show_on = req.body.show_on;
-        const product = await firestore.collection('product').doc().set({'name':name , 'price' : price , 'description' : description , 'category_id' : category_id , 'image' : image , 'show_on': show_on});
+        const result = await uploadFile(image);
+        console.log(result);
+        
+        const product = await firestore.collection('product').doc().set({'name':name , 'price' : price , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': show_on});
         res.send({message:'Product Add Successfully',status:'success',data:product});
     } catch (error) {
         console.log(error);

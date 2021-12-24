@@ -34,10 +34,11 @@ const upload = multer({
 });
 
 router.get('/', productController.getAllProduct);
-router.post('/addproduct',upload.single('image'), productController.addNewProduct);
+router.post('/addproduct', productController.addNewProduct);
 router.put('/updateproduct/:Id',upload.single('image'), productController.updateProduct);
 router.get('/:Id', productController.getProductById);
 router.delete('/deleteproduct/:Id', productController.deleteProductById);
 router.get('/showon/home', productController.getProductShowOn);
+router.get('/images/:key', productController.getProductKey);
 
 module.exports = router;
