@@ -12,6 +12,8 @@ exports.getAllProduct = async(req,res,next)=>{
     try {
         const product = await firestore.collection('product');
         const data = await product.get();
+        // const category = await firestore.collection('category');
+        // let finalData = {};
         const productArray = [];
         if(data.empty){
             res.status(404).send({message:"No product found"});
@@ -89,7 +91,7 @@ exports.getProductById = async(req,res,next)=>{
         const product = await firestore.collection('product').doc(id);
         const data = await product.get();
         if(data.empty){
-            res.status(404).send({message:"No product found",status: 'fail'});
+            res.status(404).send({message:"No product found",status: 'success'});
         }else{           
             res.send({message:'product fetch Successfully',status:'success',data: data.data()});
         }
