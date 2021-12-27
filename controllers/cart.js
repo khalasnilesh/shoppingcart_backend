@@ -51,13 +51,29 @@ exports.addtocart = async(req,res,next)=>{
 exports.getcartById = async(req,res,next)=>{
     try {
         const id = req.params.Id;
+        let finalData = [];
+        let product = {};
+        let cartdata = {};
+        await firestore.collection('product').get().then((result)=>{
+            result.forEach((doc)=>{
+                product[doc.id] = doc.data();
+            })
+        })
+        let finalProduct = [];
         const cart = await firestore.collection('cart').doc(id);
-        const data = await cart.get();
-        if(data.empty){
-            res.status(404).send({message:"No cart found",status: 'success'});
-        }else{           
-            res.send({message:'cart fetch Successfully',status:'success',data: data.data()});
-        }
+        cart.get().then((doc)=>{
+                cartdata[doc.id] = doc.data();
+                cartdata[doc.id].productName = product[doc.data().product_id].name;
+                cartdata[doc.id].productDescription = product[doc.data().product_id].description;
+                cartdata[doc.id].productImage = product[doc.data().product_id].image;
+                console.log(product[doc.data().product_id].name)
+                finalProduct = cartdata[doc.id];
+                finalData.push({id: doc.id,...finalProduct});
+                console.log(finalData);
+                res.send({message:'cart fetch Successfully',status:'success',data: finalData});
+        })          
+            
+        
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting cart',status:'fail'});
