@@ -62,6 +62,7 @@ exports.getCategoryById = async(req,res,next)=>{
         }
     } catch (error) {
         console.log(error);
+        res.send({message:'error in getting category',status:'fail'});
     }
 }
 
@@ -72,5 +73,6 @@ exports.deleteCategoryById = async(req,res,next)=>{
         res.send({message:'category deleted Successfully',status:'success'});
     } catch (error) {
         console.log(error);
+        res.send({message:'error in deleting category',status:'fail'});
     }
 }

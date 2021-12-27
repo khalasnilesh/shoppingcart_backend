@@ -58,7 +58,7 @@ exports.addNewProduct = async(req,res,next)=>{
         const result = await uploadFile(image);
         console.log(result);
         const product = await firestore.collection('product').doc().set({'name':name , 'price' : price , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': show_on});
-        res.send({message:'Product Add Successfully',status:'success',data:product});
+        res.send({message:'Product Add Successfully',status:'success',data:product.data()});
     } catch (error) {
         console.log(error);
         res.send({message:'error in inserting product',status:'fail',data : error});
@@ -93,7 +93,7 @@ exports.getProductById = async(req,res,next)=>{
         const data = await product.get();
         if(data.empty){
             res.status(404).send({message:"No product found",status: 'success'});
-        }else{           
+        }else{
             res.send({message:'product fetch Successfully',status:'success',data: data.data()});
         }
     } catch (error) {

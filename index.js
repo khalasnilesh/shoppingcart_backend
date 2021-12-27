@@ -10,6 +10,7 @@ const roleRoutes = require('./routes/roles');
 const categoryRoutes = require('./routes/category');
 const productRoutes = require('./routes/product');
 const discountRoutes = require('./routes/discount');
+const cartRoutes = require('./routes/cart');
 const session = require('express-session');
 
 app.set('views', path.join(__dirname, 'views'));
@@ -33,6 +34,7 @@ app.use('/role' , roleRoutes);
 app.use('/category',categoryRoutes);
 app.use('/product', productRoutes);
 app.use('/discount', discountRoutes);
+app.use('/cart', cartRoutes);
 
 app.get('/', function(req, res) {
   res.render('../views/home');
