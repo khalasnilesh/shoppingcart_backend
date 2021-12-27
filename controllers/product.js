@@ -10,28 +10,29 @@ const unlinkFile = util.promisify(fs.unlink);
 
 exports.getAllProduct = async(req,res,next)=>{
     try {
-        const product = await firestore.collection('product');
-        const data = await product.get();
-        // const category = await firestore.collection('category');
-        // let finalData = {};
-        const productArray = [];
-        if(data.empty){
-            res.status(404).send({message:"No product found"});
-        }else{
-            data.forEach(doc =>{
-                const product = new Product(
-                    doc.id,
-                    doc.data().name,
-                    doc.data().image,
-                    doc.data().description,
-                    doc.data().price,
-                    doc.data().category_id,
-                    doc.data().show_on,
-                );
-                productArray.push(product);
-            });
-            res.send({message:'products fetch Successfully',status:'success',data: productArray});
-        }
+        let finalData = [];
+        let category = {};
+        let productdata = {};
+        
+        await firestore.collection('category').get().then((result)=>{
+            result.forEach((doc)=>{
+                category[doc.id] = doc.data();
+            })
+        })
+        let finalProduct = [];
+        product = await firestore.collection('product')
+        product.get().then((docSnaps)=>{
+            docSnaps.forEach((doc)=>{
+                productdata[doc.id] = doc.data();
+                productdata[doc.id].categoryName = category[doc.data().category_id].name;
+                console.log(category[doc.data().category_id].name)
+                finalProduct = productdata[doc.id];
+                finalData.push({id: doc.id,...finalProduct});
+            })
+            res.send({message:'product fetch Successfully',status:'success',data: finalData});
+        })
+        
+           
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting products',status:'fail'});

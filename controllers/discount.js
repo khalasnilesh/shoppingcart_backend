@@ -1,3 +1,4 @@
+const { datastore } = require('googleapis/build/src/apis/datastore');
 const firebase = require('../db');
 const Discount = require('../models/discount');
 const firestore = firebase.firestore();
@@ -21,6 +22,37 @@ exports.getAllDiscount = async(req,res,next)=>{
             });
             res.send({message:'discount fetch Successfully',status:'success',data: discountArray});
         }
+    } catch (error) {
+        console.log(error);
+        res.send({message:'error in getting discount',status:'fail'});
+    }
+}
+
+exports.getAllDiscountWithProductName = async(req,res,next)=>{
+    try {
+        let finalData = [];
+        let product = {};
+        let promocode = {};
+        await firestore.collection('product').get().then((result)=>{
+            result.forEach((doc)=>{
+                product[doc.id] = doc.data();
+            })
+        })
+        let finalProduct = [];
+        discount = await firestore.collection('discount')
+        discount.get().then((docSnaps)=>{
+            docSnaps.forEach((doc)=>{
+                promocode[doc.id] = doc.id;
+                promocode[doc.id] = doc.data();
+                promocode[doc.id].productName = product[doc.data().product_id].name;
+                finalProduct = promocode[doc.id];
+                finalData.push({id: doc.id,...finalProduct});
+            });
+            console.log(finalData);
+
+            res.send({message:'discount fetch Successfully',status:'success',data: finalData});
+        });
+                
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting discount',status:'fail'});

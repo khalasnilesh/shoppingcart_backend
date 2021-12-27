@@ -6,6 +6,7 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 router.get('/', discoutController.getAllDiscount);
+router.get('/getdiscountwithproductName', discoutController.getAllDiscountWithProductName);
 router.post('/add_discount', discoutController.addDiscount);
 router.get('/:Id', discoutController.getDiscountById);
 router.put('/update_discount/:Id', discoutController.updateDiscount);
