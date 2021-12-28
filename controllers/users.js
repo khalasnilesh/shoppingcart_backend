@@ -265,3 +265,33 @@ exports.resetPassword = async(req,res,next)=>{
         res.send({message:'error in updating passowrd',status:'fail'});
     }
 }
+
+exports.getUserRoleBySearch = async(req,res,next)=>{
+    try {
+        let roleId = req.query.roleId;
+        let finalData = [];
+        let role = {};
+        let userdata = {};
+        
+        await firestore.collection('role').get().then((result)=>{
+            result.forEach((doc)=>{
+                role[doc.id] = doc.data();
+            })
+        })
+        let finaluser = [];
+        user = await firestore.collection('users').where('role_id','==',roleId)
+        user.get().then((docSnaps)=>{
+            docSnaps.forEach((doc)=>{
+                userdata[doc.id] = doc.data();
+                userdata[doc.id].roleName = role[doc.data().role_id].name;                
+                finaluser = userdata[doc.id];
+                finalData.push({id: doc.id,...finaluser});
+            })
+            res.send({message:'users fetch Successfully',status:'success',data: finalData});
+        })
+        } 
+    catch (error) {
+        console.log(error);
+        res.send({message:'error in getting users',status:'fail'});
+    }    
+}

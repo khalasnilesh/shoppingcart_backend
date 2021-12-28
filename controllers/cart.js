@@ -71,9 +71,7 @@ exports.getcartById = async(req,res,next)=>{
                 finalData.push({id: doc.id,...finalProduct});
                 console.log(finalData);
                 res.send({message:'cart fetch Successfully',status:'success',data: finalData});
-        })          
-            
-        
+        })
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting cart',status:'fail'});

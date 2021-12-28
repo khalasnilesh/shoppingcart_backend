@@ -16,5 +16,6 @@ router.delete('/delete/:Id', userController.deleteUser);
 router.get('/api/logout/',userController.userLogout);
 router.get('/api/forgotpassword',userController.finalForgotPassword);
 router.put('/resetpassword', userController.resetPassword);
+router.get('/searchbyrole/role', userController.getUserRoleBySearch);
 
 module.exports = router;
