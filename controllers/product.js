@@ -57,8 +57,16 @@ exports.addNewProduct = async(req,res,next)=>{
         const show_on = req.body.show_on;
         const result = await uploadFile(image);
         console.log(result);
-        const product = await firestore.collection('product').doc().set({'name':name , 'price' : price , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': show_on});
-        res.send({message:'Product Add Successfully',status:'success',data:product.data()});
+        const product = await firestore.collection('product').doc().set({'name':name , 'price' : Number(price) , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': Boolean(show_on)});
+        const data = {
+            name : name,
+            price : Number(price),
+            description : description,
+            category_id : category_id,
+            image : result.Location,
+            show_on : Boolean(show_on)
+        }
+        res.send({message:'Product Add Successfully',status:'success', data : data});
     } catch (error) {
         console.log(error);
         res.send({message:'error in inserting product',status:'fail',data : error});
@@ -78,7 +86,7 @@ exports.updateProduct = async(req,res,next)=>{
             const result = await uploadFile(image);
             console.log(result);
         const product = await firestore.collection('product').doc(id)
-        await product.update({'name': name, 'price' : price , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': show_on});
+        await product.update({'name': name, 'price' : Number(price) , 'description' : description , 'category_id' : category_id , 'image' : result.Location , 'show_on': Boolean(show_on)});
         res.send({message:'Product updated Successfully',status:'success'});
     } catch (error) {
         console.log(error);
@@ -89,13 +97,26 @@ exports.updateProduct = async(req,res,next)=>{
 exports.getProductById = async(req,res,next)=>{
     try {
         const id = req.params.Id;
-        const product = await firestore.collection('product').doc(id);
-        const data = await product.get();
-        if(data.empty){
-            res.status(404).send({message:"No product found",status: 'success'});
-        }else{
-            res.send({message:'product fetch Successfully',status:'success',data: data.data()});
-        }
+        let finalData = [];
+        let category = {};
+        let productdata = {};
+        
+        await firestore.collection('category').get().then((result)=>{
+            result.forEach((doc)=>{
+                category[doc.id] = doc.data();
+            })
+        })
+        let finalProduct = [];
+        product = await firestore.collection('product').doc(id)
+        product.get().then((doc)=>{
+                productdata[doc.id] = doc.data();
+                productdata[doc.id].categoryName = category[doc.data().category_id].name;
+                console.log(category[doc.data().category_id].name)
+                finalProduct = productdata[doc.id];
+                finalData.push({id: doc.id,...finalProduct});
+        
+                res.send({message:'product fetch Successfully',status:'success',data: finalData[0]});
+        })
     } catch (error) {
         console.log(error);
         res.send({message:"error in product fetch", status: 'fail'});
@@ -115,7 +136,7 @@ exports.deleteProductById = async(req,res,next)=>{
 
 exports.getProductShowOn = async(req,res,next)=>{
     try {
-        const product = await firestore.collection('product').where('show_on','==','1');
+        const product = await firestore.collection('product').where('show_on','==',true);
         const data = await product.get();
         
         const productArray = [];
@@ -136,6 +157,36 @@ exports.getProductShowOn = async(req,res,next)=>{
             });
             res.send({message:'product fetch Successfully',status:'success',data: productArray});
         }
+    } catch (error) {
+        console.log(error);
+        res.send({message:'error in getting products',status:'fail'});
+    }
+}
+
+exports.getProductByCategoryID = async(req,res,next)=>{
+    try {
+        let category_id = req.params.categoryId;
+        let finalData = [];
+        let category = {};
+        let productdata = {};
+        
+        await firestore.collection('category').get().then((result)=>{
+            result.forEach((doc)=>{
+                category[doc.id] = doc.data();
+            })
+        })
+        let finalProduct = [];
+        product = await firestore.collection('product').where('category_id','==',category_id)
+        product.get().then((docSnaps)=>{
+            docSnaps.forEach((doc)=>{
+                productdata[doc.id] = doc.data();
+                productdata[doc.id].categoryName = category[doc.data().category_id].name;
+                console.log(category[doc.data().category_id].name)
+                finalProduct = productdata[doc.id];
+                finalData.push({id: doc.id,...finalProduct});
+            })
+            res.send({message:'product fetch Successfully',status:'success',data: finalData});
+        })
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting products',status:'fail'});

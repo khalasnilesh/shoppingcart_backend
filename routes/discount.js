@@ -11,5 +11,6 @@ router.post('/add_discount', discoutController.addDiscount);
 router.get('/:Id', discoutController.getDiscountById);
 router.put('/update_discount/:Id', discoutController.updateDiscount);
 router.delete('/delete_discount/:Id', discoutController.deleteDiscount);
+router.get('/product/:productId', discoutController.getDiscountByProductId);
 
 module.exports = router;

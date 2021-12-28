@@ -6,6 +6,7 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 router.get('/',userController.getAllUsers);
+router.get('/api',userController.getAllUsersWithName);
 router.get('/:Id',userController.getUserByID);
 router.post('/register', userController.register);
 router.post('/adduser', userController.addUser);

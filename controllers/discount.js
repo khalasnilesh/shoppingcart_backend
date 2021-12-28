@@ -72,17 +72,31 @@ exports.addDiscount = async(req,res,next)=>{
 
 exports.getDiscountById = async(req,res,next)=>{
     try {
-        const id = req.params.Id;
-        const discount = await firestore.collection('discount').doc(id);
-        const data = await discount.get();
-        if(data.empty){
-            res.status(404).send({message:"No discount found",status: 'success'});
-        }else{           
-            res.send({message:'discount fetch Successfully',status:'success',data: data.data()});
-        }
+        let id = req.params.Id;
+        let finalData = [];
+        let product = {};
+        let promocode = {};
+        await firestore.collection('product').get().then((result)=>{
+            result.forEach((doc)=>{
+                product[doc.id] = doc.data();
+            })
+        })
+        let finalProduct = [];
+        discount = await firestore.collection('discount').doc(id)
+        discount.get().then((doc)=>{
+                promocode[doc.id] = doc.id;
+                promocode[doc.id] = doc.data();
+                promocode[doc.id].productName = product[doc.data().product_id].name;
+                finalProduct = promocode[doc.id];
+                finalData.push({id: doc.id,...finalProduct});
+            console.log(finalData);
+
+            res.send({message:'discount fetch Successfully',status:'success',data: finalData[0]});
+        });
+                
     } catch (error) {
         console.log(error);
-        res.send({message:"error in discount fetch", status: 'fail'});
+        res.send({message:'error in getting discount',status:'fail'});
     }
 }
 
@@ -110,5 +124,37 @@ exports.deleteDiscount = async(req,res,next)=>{
     } catch (error) {
         console.log(error);
         res.send({message:"error in discount deleting", status: 'fail'});
+    }
+}
+
+exports.getDiscountByProductId = async(req,res,next)=>{
+    try {
+        let product_id = req.params.productId;
+        let finalData = [];
+        let product = {};
+        let promocode = {};
+        await firestore.collection('product').get().then((result)=>{
+            result.forEach((doc)=>{
+                product[doc.id] = doc.data();
+            })
+        })
+        let finalProduct = [];
+        discount = await firestore.collection('discount').where('product_id','==',product_id)
+        discount.get().then((docSnaps)=>{
+            docSnaps.forEach((doc)=>{
+                promocode[doc.id] = doc.id;
+                promocode[doc.id] = doc.data();
+                promocode[doc.id].productName = product[doc.data().product_id].name;
+                finalProduct = promocode[doc.id];
+                finalData.push({id: doc.id,...finalProduct});
+            });
+            console.log(finalData);
+
+            res.send({message:'discount fetch Successfully',status:'success',data: finalData});
+        });
+                
+    } catch (error) {
+        console.log(error);
+        res.send({message:'error in getting discount',status:'fail'});
     }
 }

@@ -156,8 +156,33 @@ exports.addUser = async(req,res,next)=>{
 
 exports.getAllUsers = async(req,res,next)=>{
     try {
+        let role = {};
+        let city = {};
+        let state = {};
+        let country = {};
+        await firestore.collection('role').get().then((result)=>{
+            result.forEach((doc)=>{
+                role[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('city').get().then((result)=>{
+            result.forEach((doc)=>{
+                city[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('states').get().then((result)=>{
+            result.forEach((doc)=>{
+                state[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('country').get().then((result)=>{
+            result.forEach((doc)=>{
+                country[doc.id] = doc.data();
+            })
+        })
         const user = await firestore.collection('users');
         const data = await user.get();
+        
         const usersArray = [];
         if(data.empty){
             res.status(404).send({message:"No user found"});
@@ -169,9 +194,13 @@ exports.getAllUsers = async(req,res,next)=>{
                     doc.data().email,
                     doc.data().phone,
                     doc.data().role_id,
+                    role[doc.data().role_id].name,
                     doc.data().city_id,
+                    city[doc.data().city_id].name,
                     doc.data().state_id,
-                    doc.data().country_id
+                    state[doc.data().state_id].name,
+                    doc.data().country_id,
+                    country[doc.data().country_id].name,
                 );
                 usersArray.push(user);
             });
@@ -181,6 +210,59 @@ exports.getAllUsers = async(req,res,next)=>{
         console.log(error);
         res.send({message:'error in getting users',status:'fail'});
     }
+}
+
+exports.getAllUsersWithName = async(req,res,next)=>{
+    try {
+        let finalData = [];
+        let role = {};
+        let city = {};
+        let state = {};
+        let country = {};
+        let userdata = {};
+        let finalArray = {};
+        
+        await firestore.collection('role').get().then((result)=>{
+            result.forEach((doc)=>{
+                role[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('city').get().then((result)=>{
+            result.forEach((doc)=>{
+                city[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('states').get().then((result)=>{
+            result.forEach((doc)=>{
+                state[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('country').get().then((result)=>{
+            result.forEach((doc)=>{
+                country[doc.id] = doc.data();
+            })
+        })
+        let finaluser = [];
+        user = await firestore.collection('users')
+        user.get().then((docSnaps)=>{
+            docSnaps.forEach((doc)=>{
+                userdata[doc.id] = doc.data();
+                userdata[doc.id].role_name = role[doc.data().role_id].name;   
+                //console.log(city[doc.data().city_id]);
+                //console.log(state[doc.data().state_id]);
+                userdata[doc.id].city_name = city[doc.data().city_id].name;
+                userdata[doc.id].state_name = state[doc.data().state_id].name;
+                userdata[doc.id].country_name = country[doc.data().country_id].name;
+                finaluser = userdata[doc.id];
+                finalData.push({id: doc.id,...finaluser});
+            })
+            res.send({message:'users fetch Successfully',status:'success',data: finalData});
+        })
+        }
+    catch (error) {
+        console.log(error);
+        res.send({message:'error in getting users',status:'fail'});
+    }  
 }
 
 exports.updateuser = async(req,res,next) =>{
@@ -199,7 +281,31 @@ exports.updateuser = async(req,res,next) =>{
 
 exports.getUserByID = async(req,res,next)=>{
     try {
+        let role = {};
+        let city = {};
+        let state = {};
+        let country = {};
         const id = req.params.Id;
+        await firestore.collection('role').get().then((result)=>{
+            result.forEach((doc)=>{
+                role[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('city').get().then((result)=>{
+            result.forEach((doc)=>{
+                city[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('states').get().then((result)=>{
+            result.forEach((doc)=>{
+                state[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('country').get().then((result)=>{
+            result.forEach((doc)=>{
+                country[doc.id] = doc.data();
+            })
+        })
         const user = await firestore.collection('users').doc(id);
         const data = await user.get();
         const usersArray = [];
@@ -212,9 +318,13 @@ exports.getUserByID = async(req,res,next)=>{
                 email : data.data().email,
                 phone : data.data().phone,
                 role_id : data.data().role_id,
+                role_name : role[data.data().role_id].name,
                 city_id : data.data().city_id,
+                city_name : city[data.data().city_id].name,
                 state_id : data.data().state_id,
-                country_id : data.data().country_id
+                state_name : state[data.data().state_id].name,
+                country_id : data.data().country_id,
+                country_name : country[data.data().country_id].name
 
             }
             res.send({message:'user fetch Successfully',status:'success',data: userDetail});
@@ -289,7 +399,7 @@ exports.getUserRoleBySearch = async(req,res,next)=>{
             })
             res.send({message:'users fetch Successfully',status:'success',data: finalData});
         })
-        } 
+        }
     catch (error) {
         console.log(error);
         res.send({message:'error in getting users',status:'fail'});

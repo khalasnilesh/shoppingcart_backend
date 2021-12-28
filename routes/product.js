@@ -40,5 +40,6 @@ router.get('/:Id', productController.getProductById);
 router.delete('/deleteproduct/:Id', productController.deleteProductById);
 router.get('/showon/home', productController.getProductShowOn);
 router.get('/images/:key', productController.getProductKey);
+router.get('/category/:categoryId', productController.getProductByCategoryID);
 
 module.exports = router;
