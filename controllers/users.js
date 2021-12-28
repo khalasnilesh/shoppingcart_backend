@@ -19,6 +19,30 @@ exports.login = async(req,res,next)=>{
     try{
         const email = req.body.email;
         const password = req.body.password;
+        let role = {};
+        let city = {};
+        let state = {};
+        let country = {};
+        await firestore.collection('role').get().then((result)=>{
+            result.forEach((doc)=>{
+                role[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('city').get().then((result)=>{
+            result.forEach((doc)=>{
+                city[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('states').get().then((result)=>{
+            result.forEach((doc)=>{
+                state[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('country').get().then((result)=>{
+            result.forEach((doc)=>{
+                country[doc.id] = doc.data();
+            })
+        })
         const user = await firestore.collection('users').where('email','=',email).where('password','=',password).get();
         console.log(user);
         const usersArray = [];
@@ -35,9 +59,13 @@ exports.login = async(req,res,next)=>{
                     doc.data().email,
                     doc.data().phone,
                     doc.data().role_id,
+                    role[doc.data().role_id].name,
                     doc.data().city_id,
+                    city[doc.data().city_id].name,
                     doc.data().state_id,
-                    doc.data().country_id
+                    state[doc.data().state_id].name,
+                    doc.data().country_id,
+                    country[doc.data().country_id].name,
                 );
                 usersArray.push(user);
             });
