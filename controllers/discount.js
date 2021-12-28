@@ -5,11 +5,17 @@ const firestore = firebase.firestore();
 
 exports.getAllDiscount = async(req,res,next)=>{
     try {
-        const discount = await firestore.collection('discount');
+        let product = {};
+        await firestore.collection('product').get().then((result)=>{
+            result.forEach((doc)=>{
+                product[doc.id] = doc.data();
+            })
+        })
+        const discount = await firestore.collection('discount')
         const data = await discount.get();
         const discountArray = [];
         if(data.empty){
-            res.status(404).send({message:"No discount found"});
+            res.status(404).send({message:"No discount found",status : 'success'});
         }else{
             data.forEach(doc =>{
                 const discount = new Discount(
@@ -17,11 +23,13 @@ exports.getAllDiscount = async(req,res,next)=>{
                     doc.data().promo,
                     doc.data().disc_perc,
                     doc.data().product_id,
+                    product[doc.data().product_id].name,
                 );
                 discountArray.push(discount);
             });
-            res.send({message:'discount fetch Successfully',status:'success',data: discountArray});
+            res.send({message:'disocunt fetch Successfully',status:'success',data:discountArray});
         }
+                
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting discount',status:'fail'});
@@ -130,28 +138,30 @@ exports.deleteDiscount = async(req,res,next)=>{
 exports.getDiscountByProductId = async(req,res,next)=>{
     try {
         let product_id = req.params.productId;
-        let finalData = [];
         let product = {};
-        let promocode = {};
         await firestore.collection('product').get().then((result)=>{
             result.forEach((doc)=>{
                 product[doc.id] = doc.data();
             })
         })
-        let finalProduct = [];
-        discount = await firestore.collection('discount').where('product_id','==',product_id)
-        discount.get().then((docSnaps)=>{
-            docSnaps.forEach((doc)=>{
-                promocode[doc.id] = doc.id;
-                promocode[doc.id] = doc.data();
-                promocode[doc.id].productName = product[doc.data().product_id].name;
-                finalProduct = promocode[doc.id];
-                finalData.push({id: doc.id,...finalProduct});
+        const discount = await firestore.collection('discount').where('product_id','==',product_id)
+        const data = await discount.get();
+        const discountArray = [];
+        if(data.empty){
+            res.status(404).send({message:"No discount found on this product",status : 'success'});
+        }else{
+            data.forEach(doc =>{
+                const discount = new Discount(
+                    doc.id,
+                    doc.data().promo,
+                    doc.data().disc_perc,
+                    doc.data().product_id,
+                    product[doc.data().product_id].name,
+                );
+                discountArray.push(discount);
             });
-            console.log(finalData);
-
-            res.send({message:'discount fetch Successfully',status:'success',data: finalData});
-        });
+            res.send({message:'disocunt fetch Successfully',status:'success',data:discountArray});
+        }
                 
     } catch (error) {
         console.log(error);
