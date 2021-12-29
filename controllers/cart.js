@@ -4,31 +4,34 @@ const firestore = firebase.firestore();
 
 exports.getAllcart = async(req,res,next)=>{
     try {
-        let finalData = [];
         let product = {};
-        let cartdata = {};
-        
         await firestore.collection('product').get().then((result)=>{
             result.forEach((doc)=>{
                 product[doc.id] = doc.data();
             })
         })
-        let finalProduct = [];
-        cart = await firestore.collection('cart')
-        cart.get().then((docSnaps)=>{
-            docSnaps.forEach((doc)=>{
-                cartdata[doc.id] = doc.data();
-                cartdata[doc.id].productName = product[doc.data().product_id].name;
-                cartdata[doc.id].productDescription = product[doc.data().product_id].description;
-                cartdata[doc.id].productImage = product[doc.data().product_id].image;
-                console.log(product[doc.data().product_id].name)
-                finalProduct = cartdata[doc.id];
-                finalData.push({id: doc.id,...finalProduct});
-            })
-            res.send({message:'cart fetch Successfully',status:'success',data: finalData});
-        })
+        const cart = await firestore.collection('cart');
+        const data = await cart.get();
         
-           
+        const cartArray = [];
+        if(data.empty){
+            res.status(404).send({message:"No cart found"});
+        }else{
+            data.forEach(doc =>{
+                const cart = new Cart(
+                    doc.id,
+                    doc.data().product_id,
+                    doc.data().qty,
+                    product[doc.data().product_id].name,
+                    product[doc.data().product_id].description,
+                    product[doc.data().product_id].image,
+                    product[doc.data().product_id].price,
+                );
+                cartArray.push(cart);
+            });
+            res.send({message:'carts fetch Successfully',status:'success',data:cartArray});
+        }
+              
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting cart',status:'fail'});
@@ -51,27 +54,30 @@ exports.addtocart = async(req,res,next)=>{
 exports.getcartById = async(req,res,next)=>{
     try {
         const id = req.params.Id;
-        let finalData = [];
         let product = {};
-        let cartdata = {};
         await firestore.collection('product').get().then((result)=>{
             result.forEach((doc)=>{
                 product[doc.id] = doc.data();
             })
         })
-        let finalProduct = [];
-        const cart = await firestore.collection('cart').doc(id);
-        cart.get().then((doc)=>{
-                cartdata[doc.id] = doc.data();
-                cartdata[doc.id].productName = product[doc.data().product_id].name;
-                cartdata[doc.id].productDescription = product[doc.data().product_id].description;
-                cartdata[doc.id].productImage = product[doc.data().product_id].image;
-                console.log(product[doc.data().product_id].name)
-                finalProduct = cartdata[doc.id];
-                finalData.push({id: doc.id,...finalProduct});
-                console.log(finalData);
-                res.send({message:'cart fetch Successfully',status:'success',data: finalData});
-        })
+        const cart = await firestore.collection('cart').doc(id)
+        const data = await cart.get();
+        
+        if(data.empty){
+            res.status(404).send({message:"No cart found"});
+        }else{
+            const cartDetail = {
+                id : data.id,
+                qty : data.data().qty,
+                product_id : data.data().product_id,
+                product_name : product[data.data().product_id].name,
+                product_description : product[data.data().product_id].description,
+                product_image : product[data.data().product_id].image,
+                product_price : product[data.data().product_id].price,
+            }
+            res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
+        }
+                   
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting cart',status:'fail'});

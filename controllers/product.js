@@ -19,19 +19,27 @@ exports.getAllProduct = async(req,res,next)=>{
                 category[doc.id] = doc.data();
             })
         })
-        let finalProduct = [];
-        product = await firestore.collection('product')
-        product.get().then((docSnaps)=>{
-            docSnaps.forEach((doc)=>{
-                productdata[doc.id] = doc.data();
-                productdata[doc.id].categoryName = category[doc.data().category_id].name;
-                console.log(category[doc.data().category_id].name)
-                finalProduct = productdata[doc.id];
-                finalData.push({id: doc.id,...finalProduct});
-            })
-            res.send({message:'product fetch Successfully',status:'success',data: finalData});
-        })
-        
+        const product = await firestore.collection('product');
+        const data = await product.get();
+        const productArray = [];
+        if(data.empty){
+            res.status(404).send({message:"No product found"});
+        }else{
+            data.forEach(doc =>{
+                const product = new Product(
+                    doc.id,
+                    doc.data().name,
+                    doc.data().image,
+                    doc.data().description,
+                    doc.data().price,
+                    doc.data().category_id,
+                    category[doc.data().category_id].name,
+                    doc.data().show_on
+                );
+                productArray.push(product);
+            });
+            res.send({message:'product fetch Successfully',status:'success',data: productArray});
+        }
            
     } catch (error) {
         console.log(error);
@@ -106,20 +114,29 @@ exports.getProductById = async(req,res,next)=>{
                 category[doc.id] = doc.data();
             })
         })
-        let finalProduct = [];
-        product = await firestore.collection('product').doc(id)
-        product.get().then((doc)=>{
-                productdata[doc.id] = doc.data();
-                productdata[doc.id].categoryName = category[doc.data().category_id].name;
-                console.log(category[doc.data().category_id].name)
-                finalProduct = productdata[doc.id];
-                finalData.push({id: doc.id,...finalProduct});
-        
-                res.send({message:'product fetch Successfully',status:'success',data: finalData[0]});
-        })
+        const product = await firestore.collection('product').doc(id)
+        const data = await product.get();
+        const productArray = [];
+        if(data.empty){
+            res.status(404).send({message:"No product found"});
+        }else{
+                const product = new Product(
+                    data.id,
+                    data.data().name,
+                    data.data().image,
+                    data.data().description,
+                    data.data().price,
+                    data.data().category_id,
+                    category[data.data().category_id].name,
+                    data.data().show_on
+                );
+                productArray.push(product);
+            res.send({message:'product fetch Successfully',status:'success',data: productArray[0]});
+        }
+           
     } catch (error) {
         console.log(error);
-        res.send({message:"error in product fetch", status: 'fail'});
+        res.send({message:'error in getting products',status:'fail'});
     }
 }
 
@@ -165,7 +182,7 @@ exports.getProductShowOn = async(req,res,next)=>{
 
 exports.getProductByCategoryID = async(req,res,next)=>{
     try {
-        let category_id = req.params.categoryId;
+        const category_id = req.params.categoryId;
         let finalData = [];
         let category = {};
         let productdata = {};
@@ -175,18 +192,28 @@ exports.getProductByCategoryID = async(req,res,next)=>{
                 category[doc.id] = doc.data();
             })
         })
-        let finalProduct = [];
-        product = await firestore.collection('product').where('category_id','==',category_id)
-        product.get().then((docSnaps)=>{
-            docSnaps.forEach((doc)=>{
-                productdata[doc.id] = doc.data();
-                productdata[doc.id].categoryName = category[doc.data().category_id].name;
-                console.log(category[doc.data().category_id].name)
-                finalProduct = productdata[doc.id];
-                finalData.push({id: doc.id,...finalProduct});
-            })
-            res.send({message:'product fetch Successfully',status:'success',data: finalData});
-        })
+        const product = await firestore.collection('product').where('category_id','==',category_id)
+        const data = await product.get();
+        const productArray = [];
+        if(data.empty){
+            res.status(404).send({message:"No product found"});
+        }else{
+            data.forEach(doc =>{
+                const product = new Product(
+                    doc.id,
+                    doc.data().name,
+                    doc.data().image,
+                    doc.data().description,
+                    doc.data().price,
+                    doc.data().category_id,
+                    category[doc.data().category_id].name,
+                    doc.data().show_on
+                );
+                productArray.push(product);
+            });
+            res.send({message:'product fetch Successfully',status:'success',data: productArray});
+        }
+           
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting products',status:'fail'});
