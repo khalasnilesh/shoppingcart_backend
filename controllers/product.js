@@ -153,6 +153,13 @@ exports.deleteProductById = async(req,res,next)=>{
 
 exports.getProductShowOn = async(req,res,next)=>{
     try {
+        let category = {};
+
+        await firestore.collection('category').get().then((result)=>{
+            result.forEach((doc)=>{
+                category[doc.id] = doc.data();
+            })
+        })
         const product = await firestore.collection('product').where('show_on','==',true);
         const data = await product.get();
         
@@ -168,6 +175,7 @@ exports.getProductShowOn = async(req,res,next)=>{
                     doc.data().description,
                     doc.data().price,
                     doc.data().category_id,
+                    category[doc.data().category_id].name,
                     doc.data().show_on,
                 );
                 productArray.push(product);
