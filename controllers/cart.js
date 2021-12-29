@@ -64,6 +64,12 @@ exports.getcartById = async(req,res,next)=>{
     try {
         const id = req.params.Id;
         let product = {};
+        let user = {};
+        await firestore.collection('users').get().then((result)=>{
+            result.forEach((doc)=>{
+                user[doc.id] = doc.data();
+            })
+        })
         await firestore.collection('product').get().then((result)=>{
             result.forEach((doc)=>{
                 product[doc.id] = doc.data();
@@ -77,7 +83,8 @@ exports.getcartById = async(req,res,next)=>{
         }else{
             const cartDetail = {
                 id : data.id,
-                user_id : doc.data().user_id,
+                user_id : data.data().user_id,
+                user_name : user[data.data().user_id].name,
                 qty : data.data().qty,
                 product_id : data.data().product_id,
                 product_name : product[data.data().product_id].name,
