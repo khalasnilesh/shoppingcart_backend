@@ -10,5 +10,7 @@ router.post('/addtocart', cartController.addtocart);
 router.get('/:Id', cartController.getcartById);
 router.put('/update/:Id',cartController.updateAddtoCart);
 router.delete('/delete/:Id',cartController.deleteCart);
+router.get('/:Id', cartController.getcartById);
+router.get('/user/:userId', cartController.getcartByUserId);
 
 module.exports = router;
