@@ -12,5 +12,6 @@ router.put('/update/:Id',cartController.updateAddtoCart);
 router.delete('/delete/:Id',cartController.deleteCart);
 router.get('/:Id', cartController.getcartById);
 router.get('/user/:userId', cartController.getcartByUserId);
+router.post('/:Id/getdiscount', cartController.getDiscountOnPrice);
 
 module.exports = router;

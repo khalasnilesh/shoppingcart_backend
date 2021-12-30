@@ -6,6 +6,7 @@ exports.getAllcart = async(req,res,next)=>{
     try {
         let product = {};
         let user = {};
+        let discount = {};
         await firestore.collection('users').get().then((result)=>{
             result.forEach((doc)=>{
                 user[doc.id] = doc.data();
@@ -14,6 +15,11 @@ exports.getAllcart = async(req,res,next)=>{
         await firestore.collection('product').get().then((result)=>{
             result.forEach((doc)=>{
                 product[doc.id] = doc.data();
+            })
+        })
+        await firestore.collection('discount').get().then((result)=>{
+            result.forEach((doc)=>{
+                discount[doc.id] = doc.data();
             })
         })
         const cart = await firestore.collection('cart');
@@ -34,6 +40,7 @@ exports.getAllcart = async(req,res,next)=>{
                     product[doc.data().product_id].description,
                     product[doc.data().product_id].image,
                     product[doc.data().product_id].price,
+                    doc.data().discount_id,
                 );
                 cartArray.push(cart);
             });
@@ -91,6 +98,8 @@ exports.getcartById = async(req,res,next)=>{
                 product_description : product[data.data().product_id].description,
                 product_image : product[data.data().product_id].image,
                 product_price : product[data.data().product_id].price,
+                price : data.data().qty * product[data.data().product_id].price,
+                total : data.data().qty * product[data.data().product_id].price
             }
             res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
         }                   
@@ -146,24 +155,78 @@ exports.getcartByUserId = async(req,res,next)=>{
         if(data.empty){
             res.status(404).send({message:"No cart found"});
         }else{
-            data.forEach(doc =>{
-                const cart = new Cart(
-                    doc.id,
-                    doc.data().user_id,
-                    user[doc.data().user_id].name,
-                    doc.data().product_id,
-                    doc.data().qty,
-                    product[doc.data().product_id].name,
-                    product[doc.data().product_id].description,
-                    product[doc.data().product_id].image,
-                    product[doc.data().product_id].price,
-                );
-                cartArray.push(cart);
-            });
-            res.send({message:'carts fetch Successfully',status:'success',data:cartArray});
+            const cartDetail = {
+                id : data.id,
+                user_id : data.data().user_id,
+                user_name : user[data.data().user_id].name,
+                qty : data.data().qty,
+                product_id : data.data().product_id,
+                product_name : product[data.data().product_id].name,
+                product_description : product[data.data().product_id].description,
+                product_image : product[data.data().product_id].image,
+                product_price : product[data.data().product_id].price,
+                price : data.data().qty * product[data.data().product_id].price,
+                total : data.data().qty * product[data.data().product_id].price
+            }
+            res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
         }                   
     } catch (error) {
         console.log(error);
         res.send({message:'error in getting cart',status:'fail'});
+    }
+}
+
+exports.getDiscountOnPrice = async(req,res,next)=>{
+    try {
+        const id = req.params.Id;
+        const promo = req.body.promo;
+        let user = {};
+        await firestore.collection('users').get().then((result)=>{
+            result.forEach((doc)=>{
+                user[doc.id] = doc.data();
+            })
+        })
+        let product = {};
+        await firestore.collection('product').get().then((result)=>{
+            result.forEach((doc)=>{
+                product[doc.id] = doc.data();
+            })
+        })
+        let discount = {};
+        let discountArray = [];
+        let add = {};
+        await firestore.collection('discount').where('promo','==',promo).get().then((result)=>{
+            result.forEach((doc)=>{
+                discount[doc.id] = doc.data();
+                add = doc.id;
+            })
+        })
+        discountArray.push(add);
+        const finaldiscount = String(discountArray);
+        console.log(finaldiscount);
+        const cart = await firestore.collection('cart').doc(id)
+        await cart.update({'promo' : promo , 'discount_id' : finaldiscount});
+        const data = await cart.get();
+        const cartDetail = {
+            id : data.id,
+            user_id : data.data().user_id,
+            user_name : user[data.data().user_id].name,
+            qty : data.data().qty,
+            product_id : data.data().product_id,
+            product_name : product[data.data().product_id].name,
+            product_description : product[data.data().product_id].description,
+            product_image : product[data.data().product_id].image,
+            product_price : product[data.data().product_id].price,
+            price : data.data().qty * product[data.data().product_id].price,
+            promo : data.data().promo,
+            discount_id : data.data().discount_id,
+            discount_percentage : discount[data.data().discount_id].disc_perc,
+            discount_price : (data.data().qty * product[data.data().product_id].price/100)* discount[data.data().discount_id].disc_perc,
+            total : (data.data().qty * product[data.data().product_id].price) - ((data.data().qty * product[data.data().product_id].price/100)* discount[data.data().discount_id].disc_perc)
+        }
+            res.send({message:'discount add in cart Successfully',status:'success', data : cartDetail});
+    } catch (error) {
+        console.log(error);
+        res.send({message:'error in adding discount in cart',status:'fail'});
     }
 }

@@ -157,6 +157,7 @@ exports.getDiscountByProductId = async(req,res,next)=>{
                     doc.data().disc_perc,
                     doc.data().product_id,
                     product[doc.data().product_id].name,
+                    doc.data().user_id
                 );
                 discountArray.push(discount);
             });
