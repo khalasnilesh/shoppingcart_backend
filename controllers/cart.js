@@ -105,6 +105,10 @@ exports.getcartById = async(req,res,next)=>{
                     product_image : product[data.data().product_id].image,
                     product_price : product[data.data().product_id].price,
                     price : data.data().qty * product[data.data().product_id].price,
+                    promo : "",
+                    discount_id : "",
+                    discount_percentage : "",
+                    discount_price : "",
                     total : data.data().qty * product[data.data().product_id].price
                 }
                res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
@@ -200,6 +204,10 @@ exports.getcartByUserId = async(req,res,next)=>{
                     product_image : product[data.data().product_id].image,
                     product_price : product[data.data().product_id].price,
                     price : data.data().qty * product[data.data().product_id].price,
+                    promo : "",
+                    discount_id : "",
+                    discount_percentage : "",
+                    discount_price : "",
                     total : data.data().qty * product[data.data().product_id].price
                 }
                res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
