@@ -57,9 +57,8 @@ exports.addtocart = async(req,res,next)=>{
     try {
         const user_id = req.body.user_id;
         const product_id = req.body.product_id;
-        const price = req.body.price;
         const qty = req.body.quantity;
-        const cart = await firestore.collection('cart').doc().set({'user_id':user_id,'product_id':product_id , 'price' : Number(price) , 'qty' : Number(qty)});
+        const cart = await firestore.collection('cart').doc().set({'user_id':user_id,'product_id':product_id , 'qty' : Number(qty)});
         res.send({message:'cart Add Successfully',status:'success',data:cart});
     } catch (error) {
         console.log(error);
