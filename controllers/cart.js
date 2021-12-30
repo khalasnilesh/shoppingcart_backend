@@ -58,7 +58,7 @@ exports.addtocart = async(req,res,next)=>{
         const user_id = req.body.user_id;
         const product_id = req.body.product_id;
         const qty = req.body.quantity;
-        const cart = await firestore.collection('cart').doc().set({'user_id':user_id,'product_id':product_id , 'qty' : Number(qty)});
+        const cart = await firestore.collection('cart').doc().set({'user_id':user_id,'product_id':product_id , 'qty' : Number(qty) , 'promo' : '', 'discount_id' : ''});
         res.send({message:'cart Add Successfully',status:'success',data:cart});
     } catch (error) {
         console.log(error);
@@ -71,6 +71,12 @@ exports.getcartById = async(req,res,next)=>{
         const id = req.params.Id;
         let product = {};
         let user = {};
+        let discount = {};
+        await firestore.collection('discount').get().then((result)=>{
+            result.forEach((doc)=>{
+                discount[doc.id] = doc.data();
+            })
+        })
         await firestore.collection('users').get().then((result)=>{
             result.forEach((doc)=>{
                 user[doc.id] = doc.data();
@@ -83,24 +89,45 @@ exports.getcartById = async(req,res,next)=>{
         })
         const cart = await firestore.collection('cart').doc(id)
         const data = await cart.get();
-        
+        console.log(data.data().promo);
         if(data.empty){
             res.status(404).send({message:"No cart found"});
         }else{
-            const cartDetail = {
-                id : data.id,
-                user_id : data.data().user_id,
-                user_name : user[data.data().user_id].name,
-                qty : data.data().qty,
-                product_id : data.data().product_id,
-                product_name : product[data.data().product_id].name,
-                product_description : product[data.data().product_id].description,
-                product_image : product[data.data().product_id].image,
-                product_price : product[data.data().product_id].price,
-                price : data.data().qty * product[data.data().product_id].price,
-                total : data.data().qty * product[data.data().product_id].price
-            }
-            res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
+            if(data.data().promo === ""){
+                const cartDetail = {
+                    id : data.id,
+                    user_id : data.data().user_id,
+                    user_name : user[data.data().user_id].name,
+                    qty : data.data().qty,
+                    product_id : data.data().product_id,
+                    product_name : product[data.data().product_id].name,
+                    product_description : product[data.data().product_id].description,
+                    product_image : product[data.data().product_id].image,
+                    product_price : product[data.data().product_id].price,
+                    price : data.data().qty * product[data.data().product_id].price,
+                    total : data.data().qty * product[data.data().product_id].price
+                }
+               res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
+            }else{
+                const cartDetail = {
+                    id : data.id,
+                    user_id : data.data().user_id,
+                    user_name : user[data.data().user_id].name,
+                    qty : data.data().qty,
+                    product_id : data.data().product_id,
+                    product_name : product[data.data().product_id].name,
+                    product_description : product[data.data().product_id].description,
+                    product_image : product[data.data().product_id].image,
+                    product_price : product[data.data().product_id].price,
+                    price : data.data().qty * product[data.data().product_id].price,
+                    promo : data.data().promo,
+                    discount_id : data.data().discount_id,
+                    discount_percentage : discount[data.data().discount_id].disc_perc,
+                    discount_price : (data.data().qty * product[data.data().product_id].price/100)* discount[data.data().discount_id].disc_perc,
+                    total : (data.data().qty * product[data.data().product_id].price) - ((data.data().qty * product[data.data().product_id].price/100)* discount[data.data().discount_id].disc_perc)
+                }
+                res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
+            }                
         }                   
     } catch (error) {
         console.log(error);
@@ -137,12 +164,18 @@ exports.getcartByUserId = async(req,res,next)=>{
     try {
         const user_id = req.params.userId;
         let user = {};
+        let product = {};
+        let discount = {};
+        await firestore.collection('discount').get().then((result)=>{
+            result.forEach((doc)=>{
+                discount[doc.id] = doc.data();
+            })
+        })
         await firestore.collection('users').get().then((result)=>{
             result.forEach((doc)=>{
                 user[doc.id] = doc.data();
             })
         })
-        let product = {};
         await firestore.collection('product').get().then((result)=>{
             result.forEach((doc)=>{
                 product[doc.id] = doc.data();
@@ -150,28 +183,50 @@ exports.getcartByUserId = async(req,res,next)=>{
         })
         const cart = await firestore.collection('cart').where('user_id','==',user_id)
         const data = await cart.get();
+        console.log(data.data().promo);
         let cartArray =[];
         if(data.empty){
             res.status(404).send({message:"No cart found"});
         }else{
-            const cartDetail = {
-                id : data.id,
-                user_id : data.data().user_id,
-                user_name : user[data.data().user_id].name,
-                qty : data.data().qty,
-                product_id : data.data().product_id,
-                product_name : product[data.data().product_id].name,
-                product_description : product[data.data().product_id].description,
-                product_image : product[data.data().product_id].image,
-                product_price : product[data.data().product_id].price,
-                price : data.data().qty * product[data.data().product_id].price,
-                total : data.data().qty * product[data.data().product_id].price
+            if(data.data().promo === ""){
+                const cartDetail = {
+                    id : data.id,
+                    user_id : data.data().user_id,
+                    user_name : user[data.data().user_id].name,
+                    qty : data.data().qty,
+                    product_id : data.data().product_id,
+                    product_name : product[data.data().product_id].name,
+                    product_description : product[data.data().product_id].description,
+                    product_image : product[data.data().product_id].image,
+                    product_price : product[data.data().product_id].price,
+                    price : data.data().qty * product[data.data().product_id].price,
+                    total : data.data().qty * product[data.data().product_id].price
+                }
+               res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
+            }else{
+                const cartDetail = {
+                    id : data.id,
+                    user_id : data.data().user_id,
+                    user_name : user[data.data().user_id].name,
+                    qty : data.data().qty,
+                    product_id : data.data().product_id,
+                    product_name : product[data.data().product_id].name,
+                    product_description : product[data.data().product_id].description,
+                    product_image : product[data.data().product_id].image,
+                    product_price : product[data.data().product_id].price,
+                    price : data.data().qty * product[data.data().product_id].price,
+                    promo : data.data().promo,
+                    discount_id : data.data().discount_id,
+                    discount_percentage : discount[data.data().discount_id].disc_perc,
+                    discount_price : (data.data().qty * product[data.data().product_id].price/100)* discount[data.data().discount_id].disc_perc,
+                    total : (data.data().qty * product[data.data().product_id].price) - ((data.data().qty * product[data.data().product_id].price/100)* discount[data.data().discount_id].disc_perc)
+                }
+                res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
             }
-            res.send({message:'cart fetch Successfully',status:'success',data: cartDetail});
-        }                   
+        }
     } catch (error) {
         console.log(error);
-        res.send({message:'error in getting cart',status:'fail'});
+        res.send({message:'error in getting cart',status:'fail',data : error});
     }
 }
 
