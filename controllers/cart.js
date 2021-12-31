@@ -30,6 +30,27 @@ exports.getAllcart = async(req,res,next)=>{
             res.status(404).send({message:"No cart found"});
         }else{
             data.forEach(doc =>{
+                let discount_percentage = {};
+                let discount_price = {};
+                let final_total = {};
+                let discountpercArray = [];
+                let discountpriceArray = [];
+                let totalArray = [];
+                if(doc.data().discount_id === ""){
+                    discount_percentage = "";
+                    discount_price = "";
+                    final_total = doc.data().qty * product[doc.data().product_id].price
+                }else{
+                    discount_percentage = discount[doc.data().discount_id].disc_perc;
+                    discount_price = (doc.data().qty * product[doc.data().product_id].price/100)* discount[doc.data().discount_id].disc_perc
+                    final_total = (doc.data().qty * product[doc.data().product_id].price) - ((doc.data().qty * product[doc.data().product_id].price/100)* discount[doc.data().discount_id].disc_perc)
+                }
+                discountpercArray.push(discount_percentage);
+                const finaldiscountperc = Number(discountpercArray);
+                discountpriceArray.push(discount_price);
+                const finaldiscountprice = Number(discountpriceArray);
+                totalArray.push(final_total);
+                const total = Number(totalArray);
                 const cart = new Cart(
                     doc.id,
                     doc.data().user_id,
@@ -40,7 +61,10 @@ exports.getAllcart = async(req,res,next)=>{
                     product[doc.data().product_id].description,
                     product[doc.data().product_id].image,
                     product[doc.data().product_id].price,
-                    doc.data().discount_id,
+                    doc.data().discount_id, 
+                    finaldiscountperc,
+                    finaldiscountprice,
+                    total
                 );
                 cartArray.push(cart);
             });
