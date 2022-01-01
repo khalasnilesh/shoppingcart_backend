@@ -1,10 +1,11 @@
 class Cart {
-    constructor(id,user_id, user_name,product_id, qty, product_name, product_description, product_image, product_price, discount_id ,discount_percentage ,discount_price,total){
+    constructor(id,user_id, user_name,product_id, qty, created_at, product_name, product_description, product_image, product_price, discount_id ,discount_percentage ,discount_price,total){
         this.id = id;
         this.user_id = user_id;
         this.user_name = user_name;
         this.product_id = product_id;
         this.qty = qty;
+        this.created_at = created_at;
         this.proudct_name = product_name;
         this.product_description = product_description;
         this.product_image = product_image;
