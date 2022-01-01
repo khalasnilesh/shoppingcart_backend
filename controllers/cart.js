@@ -51,38 +51,17 @@ exports.getAllcart = async(req,res,next)=>{
                 const finaldiscountprice = Number(discountpriceArray);
                 totalArray.push(final_total);
                 const total = Number(totalArray);
-                //const date = doc.data().created_at;
-                let date_ob = new Date(doc.data().created_at);
-
-                // current date
-                // adjust 0 before single digit date
-                let date = ("0" + date_ob.getDate()).slice(-2);
-
-                // current month
-                let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-
-                // current year
-                let year = date_ob.getFullYear();
-
-                // current hours
-                let hours = date_ob.getHours();
-
-                // current minutes
-                let minutes = date_ob.getMinutes();
-
-                // current seconds
-                let seconds = date_ob.getSeconds();
-
-                // prints date in YYYY-MM-DD format
-                let final_date = (year + "-" + month + "-" + date);
-                console.log(final_date);
+                var date = doc.data().created_at;
+                console.log(date.toDate().toDateString());
+                var finaldate = date.toDate().toDateString()
+                
                 const cart = new Cart(
                     doc.id,
                     doc.data().user_id,
                     user[doc.data().user_id].name,
                     doc.data().product_id,
                     doc.data().qty,
-                    doc.data().created_at,
+                    finaldate,
                     product[doc.data().product_id].name,
                     product[doc.data().product_id].description,
                     product[doc.data().product_id].image,
@@ -141,7 +120,9 @@ exports.getcartById = async(req,res,next)=>{
         })
         const cart = await firestore.collection('cart').doc(id)
         const data = await cart.get();
-        console.log(data.data().promo);
+        var date = data.data().created_at;
+        console.log(date.toDate().toDateString());
+        var finaldate = date.toDate().toDateString()
         if(data.empty){
             res.status(404).send({message:"No cart found"});
         }else{
@@ -151,7 +132,7 @@ exports.getcartById = async(req,res,next)=>{
                     user_id : data.data().user_id,
                     user_name : user[data.data().user_id].name,
                     qty : data.data().qty,
-                    created_at : data.data().created_at,
+                    created_at : finaldate,
                     product_id : data.data().product_id,
                     product_name : product[data.data().product_id].name,
                     product_description : product[data.data().product_id].description,
@@ -171,7 +152,7 @@ exports.getcartById = async(req,res,next)=>{
                     user_id : data.data().user_id,
                     user_name : user[data.data().user_id].name,
                     qty : data.data().qty,
-                    created_at : data.data().created_at,
+                    created_at : finaldate,
                     product_id : data.data().product_id,
                     product_name : product[data.data().product_id].name,
                     product_description : product[data.data().product_id].description,
@@ -267,38 +248,16 @@ exports.getcartByUserId = async(req,res,next)=>{
                 const finaldiscountprice = Number(discountpriceArray);
                 totalArray.push(final_total);
                 const total = Number(totalArray);
-                //const date = doc.data().created_at;
-                let date_ob = new Date(doc.data().created_at);
-
-                // current date
-                // adjust 0 before single digit date
-                let date = ("0" + date_ob.getDate()).slice(-2);
-
-                // current month
-                let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-
-                // current year
-                let year = date_ob.getFullYear();
-
-                // current hours
-                let hours = date_ob.getHours();
-
-                // current minutes
-                let minutes = date_ob.getMinutes();
-
-                // current seconds
-                let seconds = date_ob.getSeconds();
-
-                // prints date in YYYY-MM-DD format
-                let final_date = (year + "-" + month + "-" + date);
-                console.log(final_date);
+                var date = doc.data().created_at;
+                console.log(date.toDate().toDateString());
+                const finaldate = date.toDate().toDateString();
                 const cart = new Cart(
                     doc.id,
                     doc.data().user_id,
                     user[doc.data().user_id].name,
                     doc.data().product_id,
                     doc.data().qty,
-                    doc.data().created_at,
+                    finaldate,
                     product[doc.data().product_id].name,
                     product[doc.data().product_id].description,
                     product[doc.data().product_id].image,
@@ -350,12 +309,15 @@ exports.getDiscountOnPrice = async(req,res,next)=>{
         const cart = await firestore.collection('cart').doc(id)
         await cart.update({'promo' : promo , 'discount_id' : finaldiscount});
         const data = await cart.get();
+        var date = data.data().created_at;
+        console.log(date.toDate().toDateString());
+        const finaldate = date.toDate().toDateString();
         const cartDetail = {
             id : data.id,
             user_id : data.data().user_id,
             user_name : user[data.data().user_id].name,
             qty : data.data().qty,
-            created_at : data.data().created_at,
+            created_at : finaldate,
             product_id : data.data().product_id,
             product_name : product[data.data().product_id].name,
             product_description : product[data.data().product_id].description,
