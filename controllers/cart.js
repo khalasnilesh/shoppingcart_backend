@@ -87,17 +87,18 @@ exports.addtocart = async(req,res,next)=>{
     try {
         const user_id = req.body.user_id;
         const product_id = req.body.product_id;
-        const qnty = req.body.quantity;
         const datetime = new Date();
         const cart = await firestore.collection('cart').where('user_id','==',user_id).where('product_id','==',product_id)
         const data = await cart.get();
         if(data.empty){
-            const newcart = await firestore.collection('cart').doc().set({'user_id':user_id,'product_id':product_id , 'qty' : Number(qnty) , 'promo' : '', 'discount_id' : '' , 'created_at' : datetime });
+            const newcart = await firestore.collection('cart').doc().set({'user_id':user_id,'product_id':product_id , 'qty' : 1 , 'promo' : '', 'discount_id' : '' , 'created_at' : datetime });
             res.send({message:'cart Add Successfully',status:'success',data:newcart});
         }else{
             const updatecart = firestore.collection('cart').where('user_id','==',user_id).where('product_id','==',product_id).get()
             .then(function(querySnapshot) {
             querySnapshot.forEach(function(doc) {
+                console.log(doc.data().qty);
+                const qnty = doc.data().qty + 1;
                 doc.ref.update({qty: qnty})
             });
        })
