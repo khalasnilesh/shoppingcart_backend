@@ -7,6 +7,7 @@ router.use(bodyParser.json());
 
 router.get('/', cartController.getAllcart);
 router.post('/addtocart', cartController.addtocart);
+router.post('/cartbyadd', cartController.AddToCartAndUpdate);
 router.get('/:Id', cartController.getcartById);
 router.put('/update/:Id',cartController.updateAddtoCart);
 router.delete('/delete/:Id',cartController.deleteCart);
