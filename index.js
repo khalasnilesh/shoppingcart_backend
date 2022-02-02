@@ -11,6 +11,7 @@ const categoryRoutes = require('./routes/category');
 const productRoutes = require('./routes/product');
 const discountRoutes = require('./routes/discount');
 const cartRoutes = require('./routes/cart');
+const paymentRoutes = require('./routes/payment');
 const session = require('express-session');
 
 app.set('views', path.join(__dirname, 'views'));
@@ -35,6 +36,7 @@ app.use('/category',categoryRoutes);
 app.use('/product', productRoutes);
 app.use('/discount', discountRoutes);
 app.use('/cart', cartRoutes);
+app.use('/payment', paymentRoutes);
 
 app.get('/', function(req, res) {
   res.render('../views/home');
